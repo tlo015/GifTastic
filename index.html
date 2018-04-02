@@ -11,13 +11,8 @@
 <body>
 
     <!-- container to hold the buttons  -->
-    <div class="container"></div>
-        <div id="gif-buttons"></div>
-    </div>
-
-    <!-- container to hold gifs -->
     <div class="container">
-        <div id="gif-pics"></div>
+        <div id="gif-buttons"></div>
     </div>
     
     <!-- search form  -->
@@ -29,41 +24,16 @@
         <input id="add-animal" type="submit" value="Submit">
     </div>
 
+    <!-- container to hold gifs -->
+    <div class="container">
+        <div id="gif-pics"></div>
+    </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script type="text/javascript">
     // create an array of animals that will dynamically be displayed on the top of the screen. 
     // array [];
-
     var animalArr = ["dog", "cat", "rabbit", "hamster", "skunk", "goldfish", "bird", "ferret", "turtle", "sugar glider", "chinchilla", "hedgehog", "hermit crab", "gerbil", "pygmy goat", "chicken", "capybara", " teacup pig", "serval", "salamander", "frog"]
-
-    // sign up for an gifphy API 
-    // function to display appropriate content 
-    //queryURL
-    function displayAnimals() {
-        var animals = $(this).attr (data-name);
-        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +animal+ "api_key=Lz8M8QghYuocQVkTxFRQ73XjYNlvmmVP&limit=10";
-
-        $.ajax({
-            url: queryURL,
-            method: "GET"
-        }).then(function(response) {
-            var results = response.data;
-            for (var i=0; i<results.length; i++) {
-                var gifDiv = $("<div class='item'>");
-                var rating = results[i].rating;
-                
-                var p = $("<p>").text("Rating: " +rating);
-
-                var animalImg = $("<img>");
-                animalImg.attr("src", results[i].images.fixed_height.url);
-
-                gifDiv.prepend(p);
-                gifDIv.prepend(animalImg);
-
-                $("#gif-pics").prepend(gifDiv);
-            }
-        });
-    }
 
     // render each as a button that on click will display gifs of the animal 
     //     function renderButtons 
@@ -71,7 +41,7 @@
     //         element button 
     //         add class and attr and data-name[i]and text[i]
     //         append to div
-    function renderButtons() {
+    function displayButtons() {
         $("#gif-buttons").empty();
         for (var i=0; i<animalArr.length; i++) {
             console.log ("animals: ", animalArr[i]);
@@ -83,34 +53,72 @@
         }
     }
 
-
-
-
-     
-
-    // when gifs are rendered to the page, they are paused. 
-    // upon click, they play 
-    //     data-states - still 
-    //     if else, 
-    // each click results prepends the previous results  
-
-    // search bar 
     // allows you to add buttons to the end of the string that will also display gifs when clicked 
     //     on click event 
     //     var storing the user input 
     //     .push to add the movie to the end of the array 
     //     make button 
     $("#add-animal").on("click", function() {
-        var animal=$("#animal-input").val().trim();
-        animalArray.push(animals);
-        renderButtons();
+        var newAnimal=$("#animal-input").val().trim();
+        animalArr.push(newAnimal);
+        displayButtons();
     });
-
-    $(document).on("click", ".animalBtn", displayAnimals);
-    renderButtons();
+ 
 
 
+    // sign up for an gifphy API 
+    // function to display appropriate content 
+    //queryURL
+    function displayAnimals() {
+        var animal = $(this).attr("data-name");
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +animal+ "&api_key=Lz8M8QghYuocQVkTxFRQ73XjYNlvmmVP&limit=10";
+        $.ajax({
+            url: queryURL,
+            method: "GET"
+        }).then(function(response) {
+            var results = response.data;
+            for (var i=0; i<results.length; i++) {
+                var gifDiv = $("<div>");
+                
+                var rating = results[i].rating;
+                var p = $("<p>").text("Rating: " +rating);
+                
+                var animalImg = $("<img>");
+                animalImg.attr("src", results[i].images.fixed_height_still.url);
+                //when gifs are displayed to screen, they are still - data still, data animate, data state 
+                animalImg.attr("data-still", results[i].images.fixed_height_still.url);
+                animalImg.attr("data-animate", results[i].images.fixed_height.url);
+                animalImg.attr("data-state", "still");
+                animalImg.addClass("gifImg")
 
+                gifDiv.append(p);
+                gifDiv.append(animalImg);
+                $("#gif-pics").prepend(gifDiv);
+            }
+        });
+    }
+
+    $(document).on("click", ".animal-btn", displayAnimals);
+    displayButtons();
+
+    $(document).on("click", ".gifImg", function() {
+        var state=$(this).attr("data-state");
+        if(state === "still"){
+            $(this).attr("src", $(this).attr("data-animate"));
+            $(this).attr("data-state", "animate");
+        } else{
+            $(this).attr("src", $(this).attr("data-still"));
+            $(this).attr("data-state", "still");
+        }
+    });
+     
+    // when gifs are rendered to the page, they are paused. 
+    // upon click, they play 
+    //     data-states - still 
+    //     if else, 
+    // each click results prepends the previous results  
+    // search bar 
+    
 </script>
 </body>
 </html>
